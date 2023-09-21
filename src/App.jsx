@@ -63,7 +63,6 @@ const Probability = styled.div`
 const App = () => {
   const [playerChoice, setPlayerChoice] = useState(''); // 플레이어 선택
   const [opponentChoice, setOpponentChoice] = useState(''); // 상대방 선택
-  const [opponentChoices, setOpponentChoices] = useState([]); // 상대방의 선택을 기록할 배열
   const [probabilitiesA, setProbabilitiesA] = useState({
     '가위': 33.33,
     '바위': 33.33,
@@ -76,14 +75,6 @@ const App = () => {
   }); // 사용자 B의 초기 확률
   const [selectedOpponent, setSelectedOpponent] = useState('상대방A'); // 초기 상대방 선택
   const [result, setResult] = useState(''); // 결과 저장
-
-  // 선택한 상대방에 대한 선택 기록을 로컬 스토리지에서 불러옵니다.
-  useEffect(() => {
-    const savedOpponentChoices = localStorage.getItem(selectedOpponent);
-    if (savedOpponentChoices) {
-      setOpponentChoices(JSON.parse(savedOpponentChoices));
-    }
-  }, [selectedOpponent]);
 
   // 선택한 상대방에 대한 확률을 로컬 스토리지에서 불러옵니다.
   useEffect(() => {
@@ -117,39 +108,31 @@ const App = () => {
     setOpponentChoice(choice);
   };
 
+  // 결과 계산 함수
+  const calculateResult = () => {
+    if (!playerChoice || !opponentChoice) {
+      alert('플레이어와 상대방 둘 다 선택해주세요.');
+      return;
+    }
 
-// 결과 계산 함수
-const calculateResult = () => {
-  if (!playerChoice || !opponentChoice) {
-    alert('플레이어와 상대방 둘 다 선택해주세요.');
-    return;
-  }
-
-  const opponentChoicesCopy = [...opponentChoices, opponentChoice]; // 선택을 기록
-
-  // 선택한 상대방에 따라 확률 업데이트
-  if (selectedOpponent === '상대방A') {
-    const newProbabilities = { ...probabilitiesA };
+    // 선택한 상대방에 따라 확률 업데이트
+    const selectedProbabilities = selectedOpponent === '상대방A' ? probabilitiesA : probabilitiesB;
+    const newProbabilities = { ...selectedProbabilities };
     newProbabilities[opponentChoice]++;
     const normalizedProbabilities = normalizeProbabilities(newProbabilities);
-    setProbabilitiesA(normalizedProbabilities);
+
+    if (selectedOpponent === '상대방A') {
+      setProbabilitiesA(normalizedProbabilities);
+    } else {
+      setProbabilitiesB(normalizedProbabilities);
+    }
+
     // 로컬 스토리지에 확률 저장
     localStorage.setItem(`probabilities_${selectedOpponent}`, JSON.stringify(normalizedProbabilities));
-  } else {
-    const newProbabilities = { ...probabilitiesB };
-    newProbabilities[opponentChoice]++;
-    const normalizedProbabilities = normalizeProbabilities(newProbabilities);
-    setProbabilitiesB(normalizedProbabilities);
-    // 로컬 스토리지에 확률 저장
-    localStorage.setItem(`probabilities_${selectedOpponent}`, JSON.stringify(normalizedProbabilities));
-  }
 
-  // 로컬 스토리지에 선택한 상대방의 선택 기록을 저장
-  localStorage.setItem(selectedOpponent, JSON.stringify(opponentChoicesCopy));
-
-  const winner = calculateWinner(playerChoice, opponentChoice);
-  setResult(winner);
-};
+    const winner = calculateWinner(playerChoice, opponentChoice);
+    setResult(winner);
+  };
 
   // 승패 계산 함수
   const calculateWinner = (player, opponent) => {
@@ -189,7 +172,7 @@ const calculateResult = () => {
         </ChoiceButton>
       </ButtonContainer>
       <div>
-      <h2>상대방 선택: {opponentChoice}</h2>
+        <h2>상대방 선택: {opponentChoice}</h2>
         <ButtonContainer>
           <ChoiceButton onClick={() => handleOpponentChoice('가위')}>
             <Icon icon={faHandScissors} /> 가위
@@ -201,7 +184,6 @@ const calculateResult = () => {
             <Icon icon={faHandPaper} /> 보
           </ChoiceButton>
         </ButtonContainer>
-      
         <ButtonContainer>
           <ChoiceButton onClick={calculateResult}>계산하기</ChoiceButton>
         </ButtonContainer>
