@@ -25,13 +25,14 @@ const ChoiceButton = styled.button`
   font-size: 1.5rem;
   padding: 10px 20px;
   border: none;
-  background-color: #007BFF;
+  background-color: ${props => (props.active ? '#004799' : '#007BFF')};
   color: white;
   border-radius: 5px;
   cursor: pointer;
+  transition: background-color 0.3s; /* 호버 및 클릭 효과 부드럽게 적용 */
 
   &:hover {
-    background-color: #0056b3;
+    background-color: ${props => (props.active ? '#004799' : '#0056b3')}; /* 호버 시 배경색 변경 */
   }
 `;
 
@@ -60,23 +61,27 @@ const Probability = styled.div`
   font-size: 1.2rem;
 `;
 
+const SecondGame = styled.div`
+  font-size: 1.2rem;
+`;
+
 const App = () => {
-  const [playerChoice, setPlayerChoice] = useState(''); // 플레이어 선택
-  const [opponentChoice, setOpponentChoice] = useState(''); // 상대방 선택
+  const [playerChoice, setPlayerChoice] = useState(''); 
+  const [opponentChoice, setOpponentChoice] = useState(''); 
   const [probabilitiesA, setProbabilitiesA] = useState({
     '가위': 33.33,
     '바위': 33.33,
     '보': 33.33,
-  }); // 사용자 A의 초기 확률
+  }); 
   const [probabilitiesB, setProbabilitiesB] = useState({
     '가위': 33.33,
     '바위': 33.33,
     '보': 33.33,
-  }); // 사용자 B의 초기 확률
-  const [selectedOpponent, setSelectedOpponent] = useState('상대방A'); // 초기 상대방 선택
-  const [result, setResult] = useState(''); // 결과 저장
+  }); 
+  const [selectedOpponent, setSelectedOpponent] = useState('상대방A'); 
+  const [result, setResult] = useState(''); 
+  const [isButtonActiveOpponent, setButtonActiveOpponent] = useState(false);
 
-  // 선택한 상대방에 대한 확률을 로컬 스토리지에서 불러옵니다.
   useEffect(() => {
     const savedProbabilities = localStorage.getItem(`probabilities_${selectedOpponent}`);
     if (savedProbabilities) {
@@ -88,7 +93,7 @@ const App = () => {
     }
   }, [selectedOpponent]);
 
-  // 확률을 정규화하여 합이 100%가 되도록 업데이트
+
   const normalizeProbabilities = (probs) => {
     const total = Object.values(probs).reduce((acc, val) => acc + val, 0);
     const normalizedProbs = {};
@@ -98,24 +103,22 @@ const App = () => {
     return normalizedProbs;
   };
 
-  // 사용자가 플레이어 선택한 경우
   const handlePlayerChoice = (choice) => {
     setPlayerChoice(choice);
   };
 
-  // 사용자가 상대방 선택한 경우
   const handleOpponentChoice = (choice) => {
     setOpponentChoice(choice);
+    setButtonActiveOpponent(true);
   };
 
-  // 결과 계산 함수
+
   const calculateResult = () => {
     if (!playerChoice || !opponentChoice) {
       alert('플레이어와 상대방 둘 다 선택해주세요.');
       return;
     }
 
-    // 선택한 상대방에 따라 확률 업데이트
     const selectedProbabilities = selectedOpponent === '상대방A' ? probabilitiesA : probabilitiesB;
     const newProbabilities = { ...selectedProbabilities };
     newProbabilities[opponentChoice]++;
@@ -127,14 +130,13 @@ const App = () => {
       setProbabilitiesB(normalizedProbabilities);
     }
 
-    // 로컬 스토리지에 확률 저장
     localStorage.setItem(`probabilities_${selectedOpponent}`, JSON.stringify(normalizedProbabilities));
 
     const winner = calculateWinner(playerChoice, opponentChoice);
     setResult(winner);
   };
 
-  // 승패 계산 함수
+
   const calculateWinner = (player, opponent) => {
     if (player === opponent) {
       return '무승부';
@@ -149,38 +151,56 @@ const App = () => {
     }
   };
 
-  // 다시하기 함수
   const restartGame = () => {
-    setPlayerChoice('');
-    setOpponentChoice('');
-    setResult('');
+    const isConfirmed = window.confirm('게임 기록을 리셋하시겠습니까?');
+    if (isConfirmed) {
+      setPlayerChoice('');
+      setOpponentChoice('');
+      setResult('');
+      localStorage.removeItem(`probabilities_${selectedOpponent}`);
+      setButtonActiveOpponent(false); 
+    }
   };
+
+
 
   return (
     <Container>
       <Title>가위바위보 게임</Title>
       <h2>플레이어 선택: {playerChoice}</h2>
       <ButtonContainer>
-        <ChoiceButton onClick={() => handlePlayerChoice('가위')}>
+        <ChoiceButton
+          onClick={() => handlePlayerChoice('가위')}
+        >
           <Icon icon={faHandScissors} /> 가위
         </ChoiceButton>
-        <ChoiceButton onClick={() => handlePlayerChoice('바위')}>
+        <ChoiceButton
+          onClick={() => handlePlayerChoice('바위')}
+        >
           <Icon icon={faHandRock} /> 바위
         </ChoiceButton>
-        <ChoiceButton onClick={() => handlePlayerChoice('보')}>
+        <ChoiceButton
+          onClick={() => handlePlayerChoice('보')}
+        >
           <Icon icon={faHandPaper} /> 보
         </ChoiceButton>
       </ButtonContainer>
       <div>
         <h2>상대방 선택: {opponentChoice}</h2>
         <ButtonContainer>
-          <ChoiceButton onClick={() => handleOpponentChoice('가위')}>
+          <ChoiceButton
+            onClick={() => handleOpponentChoice('가위')}
+          >
             <Icon icon={faHandScissors} /> 가위
           </ChoiceButton>
-          <ChoiceButton onClick={() => handleOpponentChoice('바위')}>
+          <ChoiceButton
+            onClick={() => handleOpponentChoice('바위')}
+          >
             <Icon icon={faHandRock} /> 바위
           </ChoiceButton>
-          <ChoiceButton onClick={() => handleOpponentChoice('보')}>
+          <ChoiceButton
+            onClick={() => handleOpponentChoice('보')}
+          >
             <Icon icon={faHandPaper} /> 보
           </ChoiceButton>
         </ButtonContainer>
@@ -206,11 +226,25 @@ const App = () => {
         </div>
       </ProbabilitiesContainer>
       <ButtonContainer>
-        <ChoiceButton onClick={() => setSelectedOpponent('상대방A')}>상대방A</ChoiceButton>
-        <ChoiceButton onClick={() => setSelectedOpponent('상대방B')}>상대방B</ChoiceButton>
+        <ChoiceButton
+          active={selectedOpponent === '상대방A'}
+          onClick={() => setSelectedOpponent('상대방A')}
+        >
+          상대방A
+        </ChoiceButton>
+        <ChoiceButton
+          active={selectedOpponent === '상대방B'}
+          onClick={() => setSelectedOpponent('상대방B')}
+        >
+          상대방B
+        </ChoiceButton>
       </ButtonContainer>
+      <SecondGame>
+        {selectedOpponent === '상대방A' && playerChoice === "가위"}
+        다음 낼 확률 : 
+      </SecondGame>
       <ButtonContainer>
-        <ChoiceButton onClick={restartGame}>다시하기</ChoiceButton>
+        <ChoiceButton onClick={restartGame}>기록 리셋하기</ChoiceButton>
       </ButtonContainer>
     </Container>
   );
