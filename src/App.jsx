@@ -7,6 +7,7 @@ const Container = styled.div`
   text-align: center;
   padding: 5px;
   background-color: #dcdde1;
+  height: screen;
 `;
 
 const Title = styled.h1`
@@ -59,10 +60,7 @@ const ProbabilitiesContainer = styled.div`
 
 const Probability = styled.div`
   font-size: 1.2rem;
-`;
-
-const SecondGame = styled.div`
-  font-size: 1.2rem;
+  margin-right:20px;
 `;
 
 const App = () => {
@@ -111,7 +109,15 @@ const App = () => {
     setOpponentChoice(choice);
     setButtonActiveOpponent(true);
   };
+  const recommendNextChoiceForUserA = () => {
+    const selectedProbabilities = probabilitiesA; 
+    return recommendRandomChoices(selectedProbabilities);
+  };
 
+  const recommendNextChoiceForUserB = () => {
+    const selectedProbabilities = probabilitiesB;
+    return recommendRandomChoices(selectedProbabilities);
+  };
 
   const calculateResult = () => {
     if (!playerChoice || !opponentChoice) {
@@ -159,10 +165,44 @@ const App = () => {
       setResult('');
       localStorage.removeItem(`probabilities_${selectedOpponent}`);
       setButtonActiveOpponent(false); 
+      window.location.reload(); 
     }
   };
 
+  const handleRecommendation = () => {
+    const YouChoice = selectedOpponent === '상대방A' ? recommendNextChoiceForUserA() : recommendNextChoiceForUserB()
+    alert(`추천하는 상대방의 다음 선택: ${YouChoice}`);
+  };
 
+  const recommendRandomChoices = (probabilities) => {
+    const choices = [];
+    for (const choice in probabilities) {
+      const probability = probabilities[choice];
+      const numRecommendations = Math.floor(probability);
+      for (let i = 0; i < numRecommendations; i++) {
+        choices.push(choice);
+      }
+    }
+    const selectedChoices = [];
+    for (let i = 0; i < 5; i++) {
+      const randomIndex = Math.floor(Math.random() * choices.length);
+      selectedChoices.push(choices[randomIndex]);
+    }
+    const counts = {};
+    selectedChoices.forEach((choice) => {
+      counts[choice] = (counts[choice] || 0) + 1;
+    });
+    let recommendedChoice = '';
+    let maxCount = 0;
+    for (const choice in counts) {
+      if (counts[choice] > maxCount) {
+        maxCount = counts[choice];
+        recommendedChoice = choice;
+      }
+    }
+    return recommendedChoice;
+  };
+  
 
   return (
     <Container>
@@ -206,6 +246,7 @@ const App = () => {
         </ButtonContainer>
         <ButtonContainer>
           <ChoiceButton onClick={calculateResult}>계산하기</ChoiceButton>
+          <ChoiceButton onClick={handleRecommendation}>추천하기</ChoiceButton>
         </ButtonContainer>
         <ResultContainer>
           <Result>{result}</Result>
@@ -239,10 +280,6 @@ const App = () => {
           상대방B
         </ChoiceButton>
       </ButtonContainer>
-      <SecondGame>
-        {selectedOpponent === '상대방A' && playerChoice === "가위"}
-        다음 낼 확률 : 
-      </SecondGame>
       <ButtonContainer>
         <ChoiceButton onClick={restartGame}>기록 리셋하기</ChoiceButton>
       </ButtonContainer>
