@@ -7,7 +7,7 @@ const Container = styled.div`
   text-align: center;
   padding: 5px;
   background-color: #dcdde1;
-  height: screen;
+  min-height: 100vh;
 `;
 
 const Title = styled.h1`
