@@ -158,7 +158,7 @@ const App = () => {
   };
 
   const restartGame = () => {
-    const isConfirmed = window.confirm('게임 기록을 리셋하시겠습니까?');
+    const isConfirmed = window.confirm('게임 기록 및 확률이 전체 리셋 됩니다. 리셋하시겠습니까?');
     if (isConfirmed) {
       setPlayerChoice('');
       setOpponentChoice('');
@@ -254,7 +254,7 @@ const App = () => {
       </div>
       <ProbabilitiesContainer>
         <div>
-          <h3>{selectedOpponent}의 다음 선택 확률</h3>
+          <h3>{selectedOpponent}의 다음 선택은?</h3>
           <ul>
             {Object.entries(
               selectedOpponent === '상대방A' ? probabilitiesA : probabilitiesB
@@ -281,7 +281,7 @@ const App = () => {
         </ChoiceButton>
       </ButtonContainer>
       <ButtonContainer>
-        <ChoiceButton onClick={restartGame}>기록 리셋하기</ChoiceButton>
+        <ChoiceButton onClick={restartGame}>기록 리셋</ChoiceButton>
       </ButtonContainer>
     </Container>
   );
