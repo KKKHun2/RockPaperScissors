@@ -12,7 +12,7 @@ const Container = styled.div`
 
 const Title = styled.h1`
   font-size: 2.5rem;
-  margin-bottom: 20px;
+  margin: 10px 0px 20px 0px;
 `;
 
 const ButtonContainer = styled.div`
@@ -28,7 +28,7 @@ const ChoiceButton = styled.button`
   border: none;
   background-color: ${props => (props.active ? '#004799' : '#007BFF')};
   color: white;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.3s; /* 호버 및 클릭 효과 부드럽게 적용 */
 
@@ -78,7 +78,7 @@ const App = () => {
   }); 
   const [selectedOpponent, setSelectedOpponent] = useState('상대방A'); 
   const [result, setResult] = useState(''); 
-  const [isButtonActiveOpponent, setButtonActiveOpponent] = useState(false);
+  const [setButtonActiveOpponent] = useState(false);
 
   useEffect(() => {
     const savedProbabilities = localStorage.getItem(`probabilities_${selectedOpponent}`);
@@ -184,7 +184,7 @@ const App = () => {
       }
     }
     const selectedChoices = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i <= 10; i++) {
       const randomIndex = Math.floor(Math.random() * choices.length);
       selectedChoices.push(choices[randomIndex]);
     }
