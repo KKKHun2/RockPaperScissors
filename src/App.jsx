@@ -184,7 +184,7 @@ const App = () => {
       }
     }
     const selectedChoices = [];
-    for (let i = 0; i <= 10; i++) {
+    for (let i = 0; i <= 20; i++) {
       const randomIndex = Math.floor(Math.random() * choices.length);
       selectedChoices.push(choices[randomIndex]);
     }
