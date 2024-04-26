@@ -4,7 +4,7 @@
 
 
 ## 배포 링크
-https://rock-paper-scissors-kkkhun2.vercel.app/
+https://r-p-s-hun.vercel.app/
 
 
 # app 메인화면
