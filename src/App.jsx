@@ -17,9 +17,9 @@ const Container = styled.div`
 `;
 
 const Title = styled.h1`
-  font-size: 3.5rem;
+  font-size: 4rem;
   font-weight: 700;
-  margin: 10px 0px 20px 0px;
+  margin: 15px 0px 20px 0px;
 `;
 
 const ButtonContainer = styled.div`
@@ -268,7 +268,7 @@ const App = () => {
 
   return (
     <Container>
-      <Title>가위 주먹 보</Title>
+      <Title>가위! 바위! 보!</Title>
       <h2>플레이어 선택: {playerChoice}</h2>
       <ButtonContainer>
         <ChoiceButton
